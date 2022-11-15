@@ -27,19 +27,20 @@ async function run(): Promise<void> {
     core.saveState(State.exactMatch, exactMatch);
 
 
-    const RepoToken = core.getInput(Inputs.RepoToken, { required: true });
-
-    const octokit = new Octokit({
-        auth: RepoToken
-    })
-
-    const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/caches{?per_page,page,ref,key,sort,direction}', {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        key: restoreKeys[0]
-    })
-
-    core.debug("Rest API: " + data);
+    const repoToken = core.getInput(Inputs.RepoToken, { required: false });
+    if (repoToken){
+        const octokit = new Octokit({
+            auth: repoToken
+        })
+    
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/caches{?per_page,page,ref,key,sort,direction}', {
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            key: restoreKeys[0]
+        })
+    
+        core.debug("Rest API: " + data);
+    }
 
 
   } catch (error: unknown) {

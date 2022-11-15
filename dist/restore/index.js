@@ -82312,16 +82312,18 @@ function run() {
             const cacheKey = yield cache.restoreCache(cachePaths, key, restoreKeys);
             const exactMatch = cacheKey === key;
             core.saveState(constants_1.State.exactMatch, exactMatch);
-            const RepoToken = core.getInput(constants_1.Inputs.RepoToken, { required: true });
-            const octokit = new octokit_1.Octokit({
-                auth: RepoToken
-            });
-            const { data } = yield octokit.request('GET /repos/{owner}/{repo}/actions/caches{?per_page,page,ref,key,sort,direction}', {
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                key: restoreKeys[0]
-            });
-            core.debug("Rest API: " + data);
+            const repoToken = core.getInput(constants_1.Inputs.RepoToken, { required: false });
+            if (repoToken) {
+                const octokit = new octokit_1.Octokit({
+                    auth: repoToken
+                });
+                const { data } = yield octokit.request('GET /repos/{owner}/{repo}/actions/caches{?per_page,page,ref,key,sort,direction}', {
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    key: restoreKeys[0]
+                });
+                core.debug("Rest API: " + data);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
