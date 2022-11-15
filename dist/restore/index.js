@@ -82303,14 +82303,13 @@ function run() {
             const cachePaths = utils.getInputAsArray(constants_1.Inputs.Path, {
                 required: true
             });
-            const primaryKey = core.getInput(constants_1.Inputs.Key, { required: true });
-            const key = primaryKey + github.context.sha;
+            const primaryKey = core.getInput(constants_1.Inputs.Key, { required: true }) + github.context.sha;
             const restoreKeys = utils.getInputAsArray(constants_1.Inputs.RestoreKeys);
             core.debug("Cache paths: " + cachePaths);
-            core.debug("Cache key: " + key);
+            core.debug("Cache key: " + primaryKey);
             core.debug("Cache restore keys: " + restoreKeys);
-            const cacheKey = yield cache.restoreCache(cachePaths, key, restoreKeys);
-            const exactMatch = cacheKey === key;
+            const cacheKey = yield cache.restoreCache(cachePaths, primaryKey, restoreKeys);
+            const exactMatch = cacheKey === primaryKey;
             core.saveState(constants_1.State.exactMatch, exactMatch);
             const repoToken = core.getInput(constants_1.Inputs.RepoToken, { required: false });
             if (repoToken) {
@@ -82331,9 +82330,16 @@ function run() {
                 else {
                     const actionCaches = data.actions_caches;
                     core.debug("Length cache found " + actionCaches.length);
-                    actionCaches.forEach((item) => {
+                    actionCaches.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         core.debug("Item id " + item.id + "key " + item.key);
-                    });
+                        if (item.key != primaryKey) {
+                            yield octokit.request('DELETE /repos/{owner}/{repo}/actions/caches{?key,ref}', {
+                                owner: github.context.repo.owner,
+                                repo: github.context.repo.repo,
+                                key: item.key
+                            });
+                        }
+                    }));
                 }
             }
         }

@@ -12,18 +12,18 @@ async function run(): Promise<void> {
     const cachePaths = utils.getInputAsArray(Inputs.Path, {
         required: true
     });
-    const primaryKey = core.getInput(Inputs.Key, { required: true });
-    const key = primaryKey + github.context.sha;
+    const primaryKey = core.getInput(Inputs.Key, { required: true })  + github.context.sha;
+    
 
     const restoreKeys = utils.getInputAsArray(Inputs.RestoreKeys);
 
     core.debug("Cache paths: " + cachePaths);
-    core.debug("Cache key: " +  key);
+    core.debug("Cache key: " +  primaryKey);
     core.debug("Cache restore keys: " + restoreKeys);
 
-    const cacheKey = await cache.restoreCache(cachePaths, key, restoreKeys);
+    const cacheKey = await cache.restoreCache(cachePaths, primaryKey, restoreKeys);
 
-    const exactMatch = cacheKey === key;
+    const exactMatch = cacheKey === primaryKey;
     core.saveState(State.exactMatch, exactMatch);
 
 
@@ -46,8 +46,15 @@ async function run(): Promise<void> {
         }else{
             const actionCaches = data.actions_caches
             core.debug("Length cache found "+ actionCaches.length)
-            actionCaches.forEach((item:any) => {
+            actionCaches.forEach( async (item:any) =>  {
                 core.debug("Item id " + item.id + "key "+ item.key)
+                if (item.key != primaryKey){ 
+                    await octokit.request('DELETE /repos/{owner}/{repo}/actions/caches{?key,ref}', { // Remove old caches
+                        owner: github.context.repo.owner,
+                        repo: github.context.repo.repo,
+                        key:item.key
+                    })
+                }
             })
         }
     }
