@@ -82322,7 +82322,15 @@ function run() {
                     repo: github.context.repo.repo,
                     key: restoreKeys[0]
                 });
-                core.debug("Rest API: " + data);
+                if (Array.isArray(data)) {
+                    core.debug("data is an array");
+                    data.forEach((item) => {
+                        core.debug(JSON.stringify(item));
+                    });
+                }
+                else {
+                    core.debug("data is not an array");
+                }
             }
         }
         catch (error) {
