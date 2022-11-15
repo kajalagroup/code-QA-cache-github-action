@@ -39,7 +39,7 @@ async function run(): Promise<void> {
             key: restoreKeys[0]
         })
     
-        core.debug("Rest API: " + data);
+        core.debug("Rest API: "  + JSON.stringify(data));
     }
 
 
