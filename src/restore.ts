@@ -6,7 +6,7 @@ import * as utils from "./utils";
 
 async function run(): Promise<void> {
   try {
-    core.debug("Checking for cached mypy cache...");
+    core.debug("Checking for cached code QA cache...");
 
     const cachePaths = utils.getInputAsArray(Inputs.Path, {
         required: true

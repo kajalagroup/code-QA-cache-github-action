@@ -6,7 +6,7 @@ import * as utils from "./utils";
 
 async function run(): Promise<void> {
   try {
-    core.debug("Maybe saving mypy cache...");
+    core.debug("Maybe saving code QA cache...");
 
     const cachePaths = utils.getInputAsArray(Inputs.Path, {
         required: true
@@ -19,7 +19,7 @@ async function run(): Promise<void> {
       await cache.saveCache(cachePaths, key);
     } else {
       core.info(
-        "Not saving the mypy cache because it was restored exactly for this commit."
+        "Not saving the code QA cache because it was restored exactly for this commit."
       );
     }
   } catch (error) {
