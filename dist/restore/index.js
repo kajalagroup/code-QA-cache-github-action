@@ -82329,7 +82329,11 @@ function run() {
                     });
                 }
                 else {
-                    core.debug("data is not an array");
+                    const actionCaches = data.actions_caches;
+                    core.debug("Length cache found " + actionCaches.length);
+                    actionCaches.forEach((item) => {
+                        core.debug("Item id " + item.id + "key " + item.key);
+                    });
                 }
             }
         }
