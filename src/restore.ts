@@ -3,6 +3,7 @@ import * as cache from "@actions/cache";
 import * as github from "@actions/github";
 import { Inputs, State } from "./constants";
 import * as utils from "./utils";
+import { Octokit, App } from "octokit";
 
 async function run(): Promise<void> {
   try {
@@ -24,6 +25,23 @@ async function run(): Promise<void> {
 
     const exactMatch = cacheKey === key;
     core.saveState(State.exactMatch, exactMatch);
+
+
+    const RepoToken = core.getInput(Inputs.RepoToken, { required: true });
+
+    const octokit = new Octokit({
+        auth: RepoToken
+    })
+
+    const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/caches{?per_page,page,ref,key,sort,direction}', {
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        key: restoreKeys[0]
+    })
+
+    core.debug("Rest API: " + data);
+
+
   } catch (error: unknown) {
     core.setFailed((error as Error).message);
   }

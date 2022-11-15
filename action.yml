@@ -14,6 +14,10 @@ inputs:
   upload-chunk-size:
     description: 'The chunk size used to split up large files during upload, in bytes'
     required: false
+  repo-token:
+    description: Github token
+    required: false
+
 runs:
   using: 'node16'
   main: "dist/restore/index.js"
