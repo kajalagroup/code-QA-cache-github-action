@@ -1,20 +1,26 @@
 import * as core from "@actions/core";
 import * as cache from "@actions/cache";
 import * as github from "@actions/github";
-import {State} from "./state";
+import { Inputs, State } from "./constants";
+import * as utils from "./utils";
 
 async function run(): Promise<void> {
   try {
     core.debug("Checking for cached mypy cache...");
 
-    const paths: string[] = [".mypy_cache"];
+    const cachePaths = utils.getInputAsArray(Inputs.Path, {
+        required: true
+    });
+    const primaryKey = core.getInput(Inputs.Key, { required: true });
+    const key = primaryKey + github.context.sha;
 
-    const keyPrefix = "mypy-cache-";
-    const key = keyPrefix + github.context.sha;
+    const restoreKeys = utils.getInputAsArray(Inputs.RestoreKeys);
 
-    const restoreKeys: string[] = [keyPrefix];
+    core.debug("Cache paths: " + cachePaths);
+    core.debug("Cache key: " +  key);
+    core.debug("Cache restore keys: " + restoreKeys);
 
-    const cacheKey = await cache.restoreCache(paths, key, restoreKeys);
+    const cacheKey = await cache.restoreCache(cachePaths, key, restoreKeys);
 
     const exactMatch = cacheKey === key;
     core.saveState(State.exactMatch, exactMatch);

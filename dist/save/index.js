@@ -63683,6 +63683,28 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 9042:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.State = exports.Inputs = void 0;
+var Inputs;
+(function (Inputs) {
+    Inputs["Key"] = "key";
+    Inputs["Path"] = "path";
+    Inputs["RestoreKeys"] = "restore-keys";
+    Inputs["UploadChunkSize"] = "upload-chunk-size";
+})(Inputs = exports.Inputs || (exports.Inputs = {}));
+var State;
+(function (State) {
+    State["exactMatch"] = "EXACT_MATCH";
+})(State = exports.State || (exports.State = {}));
+
+
+/***/ }),
+
 /***/ 5131:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -63720,17 +63742,20 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const cache = __importStar(__nccwpck_require__(7799));
 const github = __importStar(__nccwpck_require__(5438));
-const state_1 = __nccwpck_require__(9738);
+const constants_1 = __nccwpck_require__(9042);
+const utils = __importStar(__nccwpck_require__(1314));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug("Maybe saving mypy cache...");
-            const paths = [".mypy_cache"];
-            const keyPrefix = "mypy-cache-";
-            const key = keyPrefix + github.context.sha;
-            const exactMatch = core.getState(state_1.State.exactMatch);
+            const cachePaths = utils.getInputAsArray(constants_1.Inputs.Path, {
+                required: true
+            });
+            const primaryKey = core.getInput(constants_1.Inputs.Key, { required: true });
+            const key = primaryKey + github.context.sha;
+            const exactMatch = core.getState(constants_1.State.exactMatch);
             if (exactMatch === "false") {
-                yield cache.saveCache(paths, key);
+                yield cache.saveCache(cachePaths, key);
             }
             else {
                 core.info("Not saving the mypy cache because it was restored exactly for this commit.");
@@ -63747,18 +63772,41 @@ exports.default = run;
 
 /***/ }),
 
-/***/ 9738:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 1314:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.State = void 0;
-var State;
-(function (State) {
-    State["exactMatch"] = "EXACT_MATCH";
-})(State || (State = {}));
-exports.State = State;
+exports.getInputAsArray = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+function getInputAsArray(name, options) {
+    return core
+        .getInput(name, options)
+        .split("\n")
+        .map(s => s.replace(/^!\s+/, "!").trim())
+        .filter(x => x !== "");
+}
+exports.getInputAsArray = getInputAsArray;
 
 
 /***/ }),
