@@ -1,11 +1,12 @@
-name: 'Your name here'
+name: 'Code QA caching'
 description: 'Provide a description here'
-author: 'Your name or organization here'
+author: 'Tuan Bach Van'
 inputs:
-  milliseconds: # change this
+  cachefolder: # change this
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'input cache folder path'
+    default: '.mypy_cache'
 runs:
   using: 'node16'
-  main: 'dist/index.js'
+  main: "dist/restore/index.js"
+  post: "dist/save/index.js"
