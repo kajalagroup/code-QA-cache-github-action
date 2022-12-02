@@ -63696,6 +63696,7 @@ var Inputs;
     Inputs["Path"] = "path";
     Inputs["RestoreKeys"] = "restore-keys";
     Inputs["UploadChunkSize"] = "upload-chunk-size";
+    Inputs["RepoToken"] = "repo-token";
 })(Inputs = exports.Inputs || (exports.Inputs = {}));
 var State;
 (function (State) {
@@ -63747,7 +63748,7 @@ const utils = __importStar(__nccwpck_require__(1314));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.debug("Maybe saving mypy cache...");
+            core.debug("Maybe saving code QA cache...");
             const cachePaths = utils.getInputAsArray(constants_1.Inputs.Path, {
                 required: true
             });
@@ -63758,7 +63759,7 @@ function run() {
                 yield cache.saveCache(cachePaths, key);
             }
             else {
-                core.info("Not saving the mypy cache because it was restored exactly for this commit.");
+                core.info("Not saving the code QA cache because it was restored exactly for this commit.");
             }
         }
         catch (error) {
